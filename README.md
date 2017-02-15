@@ -20,3 +20,6 @@ myURL = 'Any URL'
 specific_file = 'Any unique string identifier of a desired file contained on the URL'
 
 The script filters out all 'invisible' HTML text from the website, and makes a list of files that are accessible for download in all_files. I've chosen to select a subset of these files based on date, but this filter can be changed by altering the selector_strings.
+
+# Making Oxford Greener
+This script is currently being used to measure the electricity usage of college accommodation in Linacre College, Oxford. The hope is that by seeing their daily usage relative to other flats, they will be motivated to be more energy efficient and think twice about their most energetically expensive tasks.
