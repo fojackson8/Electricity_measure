@@ -48,17 +48,19 @@ for each_string in visible_texts:
 
     
 
-# Could also put the date selector here, so that only a subset of the files are fetched and parsed. 
+# Put the date selector here, so that only a subset of the files are fetched and parsed. 
 end_date = datetime.date.today()
 start_date = end_date - datetime.timedelta(days=7)
-selector_string2 = end_date.strftime("%Y-%m")
-selector_string1 = start_date.strftime("%Y-%m")
+
+selector_string2 = end_date.strftime("%Y-%m-%d")
+selector_string1 = start_date.strftime("%Y-%m-%d")
 
 indexes1 = [i for i, x in enumerate(all_files) if selector_string1 in x]
 indexes2 = [i for i, x in enumerate(all_files) if selector_string2 in x]
 
 final_index = indexes1 + indexes2
-file_subset = (all_files[i] for i in final_index)
+index_range = np.linspace(final_index[1],final_index[0],final_index[1] - final_index[0] +1,dtype=int)
+file_subset = (all_files[i] for i in index_range)
 
 
 # Now filename is set, actually extract the csv from the site,
@@ -71,8 +73,8 @@ all_values = []
 
 
 for filename in file_subset:
-    myfile = urllib.URLopener()
-    myfile.retrieve(filename, "temp.csv")
+    myfile = urllib.request.urlopen(filename)
+    urllib.request.urlretrieve(filename, "temp.csv")
     e = pd.read_csv('temp.csv', names = ["Date","Value"])
     each_date = e.Date
     each_value = e.Value
@@ -88,42 +90,14 @@ for every_date in all_dates:
     date_num = matplotlib.dates.date2num(f)
     all1.append(date_num)
 
-
-
-# Make a function that takes a range of dates from two dates specified, 
-# in a specified format (as above), and makes a graph for the values just
-# between these timepoints
-
-# If we don't know the times at which these recordings take place,
-# then we need to find the closest datenum value that corresponds to
-# the specified date/time
-
-def daterange_Plot(start_date, end_date):
-    # get indices of my array corresponding to specified dates
-    start_indices = (i for i, item in enumerate(all_dates) if item.startswith(start_date))
-    end_indices = (i for i, item in enumerate(all_dates) if item.startswith(end_date))
     
-    g = list(start_indices)
-    h = list(end_indices)
-    start_index = g[1]
-    end_index = h[-1]
-        
-    
-    plt.plot(all1[start_index:end_index], all_values[start_index:end_index])
-    ax = plt.gca()
-    xfmt = matplotlib.dates.DateFormatter('%Y-%m-%d %H:%M:%S')
-    ax.xaxis.set_major_formatter(xfmt)
-    plt.gcf().autofmt_xdate()
-    
-# Set the start and end dates (the inputs to daterange function) relative to today's date
-end_date = datetime.date.today()
-start_date = end_date - datetime.timedelta(days=7)
-my_end = end_date.strftime("%Y-%m-%d")
-my_start = start_date.strftime("%Y-%m-%d")
-
-# Now that dates are set, run the plotting function
-
-daterange_Plot(my_start,my_end)
+plt.plot(all1, all_values)
+ax = plt.gca()
+xfmt = matplotlib.dates.DateFormatter('%Y-%m-%d %H:%M:%S')
+ax.xaxis.set_major_formatter(xfmt)
+plt.gcf().autofmt_xdate()  
+plt.xlabel('Time')
+plt.ylabel('Relative Energy Usage')
 plt.show()
 
 
